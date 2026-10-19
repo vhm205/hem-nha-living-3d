@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>Hẻm Nhà Living — Mô hình 3D tương tác</title>
+  <meta name="description" content="Mô hình kiến trúc 3D tương tác của Hẻm Nhà Living — Boutique Homestay, Monthly Living & Cafe. Dựng hoàn toàn bằng Three.js." />
+  <link rel="stylesheet" href="./styles.css" />
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 64 64%22%3E%3Crect width=%2264%22 height=%2264%22 rx=%2214%22 fill=%22%2326241f%22/%3E%3Cpath d=%22M14 40 L32 16 L50 40 Z%22 fill=%22%23e8b48f%22/%3E%3Crect x=%2222%22 y=%2240%22 width=%2220%22 height=%2211%22 fill=%22%23f3f1ec%22/%3E%3C/svg%3E" />
+  <link rel="preload" href="./vendor/three.module.js" as="script" crossorigin />
+
+  <!-- Google Fonts: Cormorant Garamond & Be Vietnam Pro -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,600&family=Pinyon+Script&display=swap" rel="stylesheet" />
+
+  <meta property="og:title" content="Hẻm Nhà Living — 3D Architecture" />
+  <meta property="og:description" content="Mô hình kiến trúc 3D tương tác của Hẻm Nhà Living — Boutique Homestay, Monthly Living & Cafe. Dựng hoàn toàn bằng Three.js." />
+  <meta property="og:type" content="website" />
+</head>
+<body>
+  <main id="app">
+    <canvas id="scene" aria-label="Mô hình 3D Hẻm Nhà Living"></canvas>
+  </main>
+
+  <div class="vignette" aria-hidden="true"></div>
+
+  <div class="ui">
+    <header class="top">
+      <div class="brand">
+        <div class="eyebrow">Hẻm Nhà Living · Kiến trúc Boutique</div>
+        <h1>Hẻm Nhà<br />Living</h1>
+        <p>Boutique Homestay, Monthly Living & Cafe. Ngôi nhà của những khoảnh khắc bình yên giữa lòng Sài Gòn. Dựng hoàn toàn bằng Three.js.</p>
+      </div>
+
+      <nav class="controls" aria-label="Điều khiển tương tác">
+        <!-- 4 Khoảnh khắc trong ngày (tính năng độc bản của Hẻm Nhà Living) -->
+        <div class="time-switch" role="group" aria-label="Khoảnh khắc">
+          <button type="button" data-time="morning" class="time-btn" title="Sớm Mai">
+            <span class="time-icon">🌅</span> Sớm Mai
+          </button>
+          <button type="button" data-time="noon" class="time-btn active" title="Trưa Hè">
+            <span class="time-icon">☀️</span> Trưa Hè
+          </button>
+          <button type="button" data-time="sunset" class="time-btn" title="Hoàng Hôn">
+            <span class="time-icon">🌇</span> Hoàng Hôn
+          </button>
+          <button type="button" data-time="night" class="time-btn" title="Đêm Sao">
+            <span class="time-icon">🌙</span> Đêm Sao
+          </button>
+        </div>
+
+        <!-- Phân loại không gian: Ngoại thất vs Bên trong Hẻm Home -->
+        <div class="view-category-tabs" role="tablist" aria-label="Phân loại không gian">
+          <button type="button" class="tab-btn active" data-tab="exterior">🏛️ Ngoại thất</button>
+          <button type="button" class="tab-btn" data-tab="interior">✨ Bên trong Hẻm Home</button>
+        </div>
+
+        <!-- Góc nhìn Ngoại thất -->
+        <div class="seg view-group" data-group="exterior" role="group" aria-label="Góc nhìn ngoại thất">
+          <button type="button" data-view="hero" class="active">3/4</button>
+          <button type="button" data-view="front">Mặt đứng</button>
+          <button type="button" data-view="top">Mặt bằng</button>
+          <button type="button" data-view="rooftop">Sân thượng</button>
+          <button type="button" data-view="entrance">Cổng vào</button>
+        </div>
+
+        <!-- Góc nhìn Bên trong Hẻm Home -->
+        <div class="seg view-group" data-group="interior" role="group" aria-label="Góc nhìn bên trong" style="display: none;">
+          <button type="button" data-view="cafe">☕ Cafe Lounge</button>
+          <button type="button" data-view="atrium">🌿 Giếng trời</button>
+          <button type="button" data-view="studio">🛏️ Phòng Homestay</button>
+          <button type="button" data-view="street">🚶 Trong Hẻm</button>
+        </div>
+
+        <!-- Toggles -->
+        <div class="toggles">
+          <button type="button" class="toggle" data-toggle="rotate" aria-pressed="false">
+            <span class="dot"></span>Tự xoay
+          </button>
+          <button type="button" class="toggle" data-toggle="clay" aria-pressed="false">
+            <span class="dot"></span>Mô hình trắng
+          </button>
+        </div>
+      </nav>
+    </header>
+
+    <footer class="bottom">
+      <div class="meta">
+        <div class="meta-row"><span class="k">Công trình</span><span class="v">5 tầng · 18 m</span></div>
+        <div class="meta-row"><span class="k">Mặt bằng</span><span class="v">7,2 × 18 m</span></div>
+        <div class="meta-row"><span class="k">Chức năng</span><span class="v">Cafe sân vườn · Homestay · Rooftop Bida</span></div>
+      </div>
+      <div class="hint">
+        <span>Kéo để xoay</span><span class="sep">/</span>
+        <span>Chuột phải để dịch chuyển</span><span class="sep">/</span>
+        <span>Cuộn để thu phóng</span>
+      </div>
+    </footer>
+  </div>
+
+  <div id="loader" aria-live="polite">
+    <div class="loader-inner">
+      <div class="loader-eyebrow">Three.js · Procedural Architecture</div>
+      <div class="loader-title">Hẻm Nhà Living</div>
+      <div class="loader-bar"><span></span></div>
+      <div class="loader-note" id="loader-note">Đang dựng mô hình 3D…</div>
+    </div>
+  </div>
+
+  <noscript>
+    <div class="noscript">Trang này cần JavaScript để dựng mô hình 3D.</div>
+  </noscript>
+
+  <script type="importmap">
+    {
+      "imports": {
+        "three": "./vendor/three.module.js",
+        "three/addons/": "./vendor/addons/"
+      }
+    }
+  </script>
+  <script type="module" src="./main.js"></script>
+</body>
+</html>

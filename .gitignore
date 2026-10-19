@@ -1,0 +1,14 @@
+# Dependencies & browser binaries
+node_modules/
+chrome/
+
+# OS and temp files
+.DS_Store
+Thumbs.db
+*.Zone.Identifier
+*.tmp
+*.log
+
+# Test snapshots
+test_*.png
+render_screenshot.png
